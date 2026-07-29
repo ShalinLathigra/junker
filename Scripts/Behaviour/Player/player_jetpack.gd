@@ -1,3 +1,4 @@
+class_name PlayerJetpack
 extends State
 
 const MAX_JUMP_SPEED: float = -100

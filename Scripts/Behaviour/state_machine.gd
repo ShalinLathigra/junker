@@ -1,22 +1,21 @@
 class_name StateMachine
-extends Node
+extends RefCounted
 
 # Future effort, convert nodes to refcounted!
 @export var debug: bool
 
+var id: String
 var current_state: State
 var child_states: Array[State]
 var blackboard: Dictionary
 
 
-func _ready() -> void:
-	# For each immediate child, if it's a state, then consume it
-	for child in get_children():
-		if child is State:
-			child_states.push_back(child as State)
+func register_states(states: Array[State]) -> void:
+	child_states.append_array(states)
 
 
 func init() -> void:
+	id = get_script().get_global_name()
 	for child in child_states:
 		child.init()
 
@@ -38,13 +37,13 @@ func check_transitions() -> void:
 	if next_state == current_state or next_state == null:
 		return
 	if debug:
-		var old_name: String = "null"
+		var old_id: String = "null"
 		if current_state:
-			old_name = current_state.name
+			old_id = current_state.id
 		var message: String = "%s Transition: %s -> %s (%d)" % [
-			name,
-			old_name,
-			next_state.name,
+			id,
+			old_id,
+			next_state.id,
 			Time.get_ticks_msec(),
 		]
 		print(message)
@@ -64,6 +63,10 @@ func tick(delta: float):
 func physics_tick(delta: float):
 	if current_state:
 		current_state.physics_tick(delta)
+
+
+func _init_states(state: Array[State]) -> void:
+	child_states.push_back(state)
 """
 Pending idea, go from "current state decides behaviour", with behaviour
 	transitions happening top down
@@ -79,8 +82,8 @@ Pending idea, go from "current state decides behaviour", with behaviour
 		Unfortunately, this means that it's a bit awkward to design higher
 			order behaviours. Information must be stored or piped in via the
 			blackboard, which is available, just gets messy and I need to be
-			paying attention to variable names, etc.
-				Possibly avoidable by using node names, etc. and a more
+			paying attention to variable ids, etc.
+				Possibly avoidable by using node ids, etc. and a more
 					sophisticated dict wrapper
 	
 	Second approach means I can hardcode transitions more easily

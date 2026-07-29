@@ -1,3 +1,4 @@
+class_name PlayerRun
 extends State
 
 const RUN_SPEED = 16 * 5 # 16 tile width * 8 tiles

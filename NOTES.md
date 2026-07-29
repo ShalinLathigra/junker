@@ -12,7 +12,18 @@
     - Should create on load, add more when needed, and re-use when done
     - No scripting should be needed for this other than "play particle A"
 
+## Audio stuff
+- made the object pool, next step is to make methods for actually triggering audio playback
+    - Maybe movement audio is tied to an animation somehow. Still figuring that out
+        - Custom spriteFrames resource + player to let me attach sounds and particles to frames
+        - Do that instead of refcounted
+
 ## State Machines
+
+
+!! Switched this stuff to being RefCounted instead of Node, this means that they live mostly in code instead of being part of the tree (since they really don't need to be)
+!! This means that nodes don't communicate between them as much, but we can cross that when we need to. Probably this is just more detailed setup in the state machine.
+!! or a method or two for searching through the state tree on startup.
 
 I want to make a simple 'scripting language' out of nodes. There will be
 two kinds of nodes.

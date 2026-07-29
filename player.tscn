@@ -11,13 +11,6 @@
 [ext_resource type="Texture2D" uid="uid://dhwoarwj4nl6l" path="res://Assets/Hero/improved run.png" id="9_5tmop"]
 [ext_resource type="Texture2D" uid="uid://bsjd4vq7grkq5" path="res://Assets/Hero/attack 4.png" id="10_7ahtn"]
 [ext_resource type="Script" uid="uid://dl1dw4qbpu2lv" path="res://Scripts/Animation/sprite_animator.gd" id="11_pylmc"]
-[ext_resource type="Script" uid="uid://byary71klql1u" path="res://Scripts/Behaviour/state_machine.gd" id="12_pylmc"]
-[ext_resource type="Script" uid="uid://comechj7xraaf" path="res://Scripts/Behaviour/Player/player_air_control.gd" id="13_pylmc"]
-[ext_resource type="Script" uid="uid://bcly46br4sn5u" path="res://Scripts/Behaviour/Player/player_jetpack.gd" id="14_pbfsw"]
-[ext_resource type="Script" uid="uid://bd574kg0ap77n" path="res://Scripts/Behaviour/fall.gd" id="15_pylmc"]
-[ext_resource type="Script" uid="uid://bvihcj7r0s5ic" path="res://Scripts/Behaviour/Player/player_ground_control.gd" id="16_pylmc"]
-[ext_resource type="Script" uid="uid://cjdjbt756imkv" path="res://Scripts/Behaviour/Player/player_run.gd" id="17_pylmc"]
-[ext_resource type="Script" uid="uid://d1eh3pohrp70o" path="res://Scripts/Behaviour/idle.gd" id="18_pylmc"]
 [ext_resource type="Script" uid="uid://j2irqosk23wv" path="res://Scripts/Debug/state_display.gd" id="19_pylmc"]
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_uty7l"]
@@ -613,34 +606,6 @@ script = ExtResource("11_pylmc")
 position = Vector2(0, -5.5)
 shape = SubResource("CapsuleShape2D_liex2")
 
-[node name="StateMachine" type="Node" parent="." unique_id=1514216124]
-unique_name_in_owner = true
-script = ExtResource("12_pylmc")
-
-[node name="AirControl" type="Node" parent="StateMachine" unique_id=1610854857]
-unique_name_in_owner = true
-script = ExtResource("13_pylmc")
-
-[node name="Jetpack" type="Node" parent="StateMachine/AirControl" unique_id=1244796824]
-script = ExtResource("14_pbfsw")
-debug = true
-
-[node name="Fall" type="Node" parent="StateMachine/AirControl" unique_id=703876680]
-script = ExtResource("15_pylmc")
-debug = true
-
-[node name="GroundControl" type="Node" parent="StateMachine" unique_id=475173353]
-unique_name_in_owner = true
-script = ExtResource("16_pylmc")
-
-[node name="Run" type="Node" parent="StateMachine/GroundControl" unique_id=213447854]
-unique_name_in_owner = true
-script = ExtResource("17_pylmc")
-
-[node name="Idle" type="Node" parent="StateMachine/GroundControl" unique_id=591476128]
-unique_name_in_owner = true
-script = ExtResource("18_pylmc")
-
 [node name="EarlyGroundRay" type="RayCast2D" parent="." unique_id=1660278969]
 unique_name_in_owner = true
 position = Vector2(0, -1)
@@ -666,4 +631,4 @@ theme_override_font_sizes/font_size = 8
 text = "GroundControl"
 horizontal_alignment = 1
 script = ExtResource("19_pylmc")
-target_node = NodePath("../../StateMachine")
+target_node = NodePath("../..")

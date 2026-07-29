@@ -2,14 +2,15 @@ extends CharacterBody2D
 
 # blackboard
 var blackboard: Dictionary
-
 # Track reference to the state machine and animator for feeding in to nodes
-@onready var state_machine: StateMachine = %StateMachine as StateMachine
+var state_machine: StateMachine
+
 @onready var sprite_animator: SpriteAnimator = %SpriteAnimator as SpriteAnimator
 @onready var early_ground_ray: RayCast2D = %EarlyGroundRay as RayCast2D
 
 
 func _ready() -> void:
+	_init_state_machine()
 	blackboard.is_idle = true
 	blackboard.body = self as CharacterBody2D
 	blackboard.sprite_animator = sprite_animator
@@ -50,3 +51,12 @@ func _physics_process(delta: float) -> void:
 	# Yes it's ugly, but it's fiine
 
 	state_machine.physics_tick(delta)
+
+
+func _init_state_machine() -> void:
+	state_machine = StateMachine.new()
+	var ground = PlayerGround.new()
+	ground.register_states([PlayerRun.new(), Idle.new()])
+	var air = PlayerAir.new()
+	air.register_states([PlayerJetpack.new(), Fall.new()])
+	state_machine.register_states([air, ground])

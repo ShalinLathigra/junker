@@ -1,3 +1,4 @@
+class_name Fall
 extends State
 
 const MAX_FALL_SPEED = 300

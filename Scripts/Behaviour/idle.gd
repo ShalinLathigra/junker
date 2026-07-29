@@ -1,3 +1,4 @@
+class_name Idle
 extends State
 
 var sprite_animator: SpriteAnimator

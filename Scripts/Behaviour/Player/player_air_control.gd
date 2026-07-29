@@ -1,3 +1,4 @@
+class_name PlayerAir
 extends State
 
 const MAX_FALL_SPEED = 300
