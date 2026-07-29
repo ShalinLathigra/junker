@@ -4,6 +4,7 @@ extends State
 const MAX_JUMP_SPEED: float = -100
 const START_JUMP_SPEED: float = -80
 const ACCEL_TICKS: int = 1000
+const MIN_ACCEL_TICKS: int = 250
 const COYOTE_TIME_TICKS: int = 300
 const JUMP_BUFFER_TICKS: int = 200
 
@@ -57,10 +58,13 @@ func exit() -> void:
 func tick(_delta: float) -> void:
 	var current_tick: int = Time.get_ticks_msec()
 	var input_held: bool = blackboard.get("jump_input_held", false)
-	if not boost_over and not input_held:
-		boost_over = true
-
-	if boost_over or current_tick - tick_of_accel_start >= ACCEL_TICKS:
+	var elapsed_ticks: int = current_tick - tick_of_accel_start
+	if not boost_over:
+		if not input_held and elapsed_ticks > MIN_ACCEL_TICKS:
+			boost_over = true
+		elif elapsed_ticks >= ACCEL_TICKS:
+			boost_over = true
+	if boost_over:
 		blackboard.is_mid_flight = false
 
 
