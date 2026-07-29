@@ -7,11 +7,15 @@ const ACCEL_TICKS: int = 1000
 const MIN_ACCEL_TICKS: int = 250
 const COYOTE_TIME_TICKS: int = 300
 const JUMP_BUFFER_TICKS: int = 200
+const JUMP_AUDIO_RESOURCE_PATH: StringName = "res://Assets/jump3.ogg"
+const JETPACK_AUDIO_RESOURCE_PATH: StringName = "res://Assets/engine5.ogg"
 
 # Relevant information for the player:
 var body: CharacterBody2D
 var tick_of_accel_start: int
 var boost_over: bool = false
+var jump_player: AudioStreamPlayer
+var jetpack_player: AudioStreamPlayer
 
 
 # So, we want to implement:
@@ -20,8 +24,16 @@ var boost_over: bool = false
 # 	2. coyote time for when a player is a tiny bit late
 # 	3. Initial jerk + upwards acceleration
 func init() -> void:
+	# Fetch body
 	body = blackboard.get("body", null)
 	assert(body)
+	# Request players
+	jump_player = AudioManager.request_audio_player()
+	jetpack_player = AudioManager.request_audio_player()
+	# Load and configure players
+	jump_player.stream = load(JUMP_AUDIO_RESOURCE_PATH)
+	jump_player.volume_db = -16.0
+	jetpack_player.stream = load(JETPACK_AUDIO_RESOURCE_PATH)
 	super.init()
 
 
@@ -49,16 +61,25 @@ func enter() -> void:
 	blackboard.is_mid_flight = true
 	tick_of_accel_start = Time.get_ticks_msec()
 	boost_over = false
+	jump_player.play()
+	jetpack_player.play()
 
 
 func exit() -> void:
 	blackboard.is_mid_flight = false
+	jump_player.stop()
+	jetpack_player.stop()
 
 
 func tick(_delta: float) -> void:
 	var current_tick: int = Time.get_ticks_msec()
 	var input_held: bool = blackboard.get("jump_input_held", false)
 	var elapsed_ticks: int = current_tick - tick_of_accel_start
+	jetpack_player.volume_db = lerp(
+		-32.0,
+		-12.0,
+		min(1.0, float(elapsed_ticks) / MIN_ACCEL_TICKS),
+	)
 	if not boost_over:
 		if not input_held and elapsed_ticks > MIN_ACCEL_TICKS:
 			boost_over = true

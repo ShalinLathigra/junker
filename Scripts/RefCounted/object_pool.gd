@@ -39,7 +39,7 @@ func request() -> Variant:
 	_spawn_if_needed()
 	var next = _available.pop_back()
 	assert(not _is_invalid(next), "%s Retrieved null or invalid entry")
-	return _available.pop_back
+	return next
 
 
 func count_pool() -> int:

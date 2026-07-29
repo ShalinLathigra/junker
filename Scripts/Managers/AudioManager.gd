@@ -17,5 +17,28 @@ func _ready() -> void:
 	audio_pool.init("AudioManagerPool", _generate_audio_player)
 
 
+func play_audio_frame(frame: AudioFrame) -> void:
+	var new_player: AudioStreamPlayer = audio_pool.request()
+	new_player.stream = frame.stream
+	new_player.volume_db = frame.volume_db
+	new_player.pitch_scale = frame.pitch_scale
+	new_player.finished.connect(
+		release_audio_player.bind(new_player),
+		CONNECT_ONE_SHOT,
+	)
+	new_player.play()
+
+
+func release_audio_player(p: AudioStreamPlayer) -> void:
+	p.stop()
+	audio_pool.release(p)
+
+
+func request_audio_player() -> AudioStreamPlayer:
+	return audio_pool.request()
+
+
 func _generate_audio_player() -> AudioStreamPlayer:
-	return AudioStreamPlayer.new()
+	var new_player = AudioStreamPlayer.new()
+	add_child(new_player)
+	return new_player
