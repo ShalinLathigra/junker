@@ -16,15 +16,15 @@ func init() -> void:
 
 
 # Enter run if grounded and have input
-func is_ready() -> bool:
+func is_ready(_old_line: Array[State]) -> bool:
 	var ret: bool = blackboard.get("x_input_axis", 0.0) != 0 and \
 			blackboard.get("is_grounded", false)
 	return ret
 
 
-func enter() -> void:
+func enter(_old_line: Array[State] = []) -> void:
 	anim.play_immediate("Run")
-	super.enter()
+	super.enter(_old_line)
 
 
 func physics_tick(delta: float) -> void:

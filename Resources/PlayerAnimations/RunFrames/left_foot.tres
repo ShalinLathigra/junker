@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="AudioFrame" format=3 uid="uid://cjpyipdca72ew"]
+
+[ext_resource type="Script" uid="uid://p8du8ljpdj8k" path="res://Scripts/Animation/audio_frame.gd" id="1_s4cjd"]
+[ext_resource type="AudioStream" uid="uid://cw5dgcbefuh66" path="res://Assets/footstep_wood_003.ogg" id="2_weg3u"]
+
+[resource]
+script = ExtResource("1_s4cjd")
+stream = ExtResource("2_weg3u")
+volume_db = -6.099999999999994
+pitch_scale = 0.9
+metadata/_custom_type_script = "uid://p8du8ljpdj8k"

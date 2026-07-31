@@ -2,9 +2,9 @@
 
 [ext_resource type="Script" uid="uid://8wekqn6pw02d" path="res://Scripts/player.gd" id="1_606se"]
 [ext_resource type="SpriteFrames" uid="uid://qcnm88hiql7t" path="res://Resources/player_frames.tres" id="2_hqtel"]
-[ext_resource type="Script" uid="uid://ch65tmo1qsrum" path="res://Scripts/Animation/secondary_animator.gd" id="4_sweqy"]
-[ext_resource type="Resource" uid="uid://cr6lsj0hs50qy" path="res://Resources/run_audio_frames.tres" id="6_1jxqw"]
-[ext_resource type="Script" uid="uid://w1b62w7ibwwf" path="res://Scripts/Animation/audio_frames.gd" id="7_dw050"]
+[ext_resource type="Script" uid="uid://ch65tmo1qsrum" path="res://Scripts/Animation/secondary_frames.gd" id="4_sweqy"]
+[ext_resource type="Script" uid="uid://mj7x2kxhgiuu" path="res://Scripts/Animation/secondary_animation.gd" id="5_nvl01"]
+[ext_resource type="Resource" uid="uid://bt4vlewduhkry" path="res://Resources/PlayerAnimations/run.tres" id="6_1jxqw"]
 [ext_resource type="Script" uid="uid://dl1dw4qbpu2lv" path="res://Scripts/Animation/sprite_animator.gd" id="11_pylmc"]
 [ext_resource type="Script" uid="uid://j2irqosk23wv" path="res://Scripts/Debug/state_display.gd" id="19_pylmc"]
 
@@ -18,15 +18,16 @@ script = ExtResource("1_606se")
 [node name="SpriteAnimator" type="AnimatedSprite2D" parent="." unique_id=1130625279]
 unique_name_in_owner = true
 sprite_frames = ExtResource("2_hqtel")
-animation = &"Run"
-frame = 5
+animation = &"Landing"
+frame = 3
+frame_progress = 1.0
 offset = Vector2(10.5, -16)
 script = ExtResource("11_pylmc")
 
 [node name="SecondaryAnimator" type="Node" parent="SpriteAnimator" unique_id=604910867 node_paths=PackedStringArray("target")]
 script = ExtResource("4_sweqy")
 target = NodePath("..")
-audio_frames = Dictionary[StringName, ExtResource("7_dw050")]({
+secondary_frames = Dictionary[StringName, ExtResource("5_nvl01")]({
 &"Run": ExtResource("6_1jxqw")
 })
 

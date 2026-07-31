@@ -25,11 +25,11 @@ func init() -> void:
 	super.init()
 
 
-func enter() -> void:
+func enter(_old_line: Array[State] = []) -> void:
 	tick_of_next_frame = 0
 	anim.play_immediate("Jetpack")
 	anim.stop()
-	super.enter()
+	super.enter(_old_line)
 
 
 func exit() -> void:

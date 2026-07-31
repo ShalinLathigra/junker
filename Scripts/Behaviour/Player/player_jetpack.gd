@@ -1,6 +1,9 @@
 class_name PlayerJetpack
 extends State
 
+const MIN_JETPACK_DB: float = -32.0
+const MAX_JETPACK_DB: float = -24.0
+const JUMP_DB: float = -22.0
 const MAX_JUMP_SPEED: float = -100
 const START_JUMP_SPEED: float = -80
 const ACCEL_TICKS: int = 1000
@@ -27,13 +30,18 @@ func init() -> void:
 	# Fetch body
 	body = blackboard.get("body", null)
 	assert(body)
-	# Request players
+	# Configure players
 	jump_player = AudioManager.request_audio_player()
 	jetpack_player = AudioManager.request_audio_player()
-	# Load and configure players
-	jump_player.stream = load(JUMP_AUDIO_RESOURCE_PATH)
-	jump_player.volume_db = -16.0
-	jetpack_player.stream = load(JETPACK_AUDIO_RESOURCE_PATH)
+	AudioManager.use_stream(
+		jump_player,
+		load(JUMP_AUDIO_RESOURCE_PATH),
+		JUMP_DB,
+	)
+	AudioManager.use_stream(
+		jetpack_player,
+		load(JETPACK_AUDIO_RESOURCE_PATH),
+	)
 	super.init()
 
 
@@ -52,17 +60,18 @@ func is_initial_jump_input_valid() -> bool:
 					Time.get_ticks_msec()
 
 
-func is_ready() -> bool:
+func is_ready(_old_line: Array[State]) -> bool:
 	return is_initial_jump_input_valid() or \
 			blackboard.get("is_mid_flight", false)
 
 
-func enter() -> void:
+func enter(_old_line: Array[State] = []) -> void:
 	blackboard.is_mid_flight = true
 	tick_of_accel_start = Time.get_ticks_msec()
 	boost_over = false
 	jump_player.play()
 	jetpack_player.play()
+	super.enter(_old_line)
 
 
 func exit() -> void:
@@ -76,8 +85,8 @@ func tick(_delta: float) -> void:
 	var input_held: bool = blackboard.get("jump_input_held", false)
 	var elapsed_ticks: int = current_tick - tick_of_accel_start
 	jetpack_player.volume_db = lerp(
-		-32.0,
-		-12.0,
+		MIN_JETPACK_DB,
+		MAX_JETPACK_DB,
 		min(1.0, float(elapsed_ticks) / MIN_ACCEL_TICKS),
 	)
 	if not boost_over:

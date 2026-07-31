@@ -6,6 +6,8 @@ var blackboard: Dictionary
 var state_machine: StateMachine
 
 @onready var sprite_animator: SpriteAnimator = %SpriteAnimator as SpriteAnimator
+# also attach a config file here, this will contain stuff like 
+# audio frames, etc. that we need access to elsewhere
 @onready var early_ground_ray: RayCast2D = %EarlyGroundRay as RayCast2D
 
 

@@ -13,7 +13,7 @@ var tick_of_next_frame: int
 var frame_tick_delta: int
 
 
-func is_ready() -> bool:
+func is_ready(_old_line: Array[State]) -> bool:
 	# if any child state is ready, then flag this one as ready
 	# use super.is_ready because some child states could trigger this
 	# early, i.e. jumping
@@ -28,9 +28,10 @@ func init() -> void:
 	super.init()
 
 
-func enter() -> void:
+func enter(_old_line: Array[State] = []) -> void:
 	# fall_acc_t = 0.0
 	anim.play_immediate("Fall")
+	super.enter(_old_line)
 
 
 func exit() -> void:

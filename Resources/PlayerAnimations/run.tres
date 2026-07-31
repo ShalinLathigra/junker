@@ -1,0 +1,26 @@
+[gd_resource type="Resource" script_class="SecondaryFrames" format=3 uid="uid://bt4vlewduhkry"]
+
+[ext_resource type="Script" uid="uid://bw7rrjq71rjhn" path="res://Scripts/Animation/secondary_frame.gd" id="1_1tuak"]
+[ext_resource type="Script" uid="uid://6xfwqwi3tc35" path="res://Scripts/Animation/particle_frame.gd" id="2_gukny"]
+[ext_resource type="Script" uid="uid://p8du8ljpdj8k" path="res://Scripts/Animation/audio_frame.gd" id="3_axwee"]
+[ext_resource type="Resource" uid="uid://cjpyipdca72ew" path="res://Resources/PlayerAnimations/RunFrames/left_foot.tres" id="4_ki0ob"]
+[ext_resource type="Resource" uid="uid://bm4koff8fn648" path="res://Resources/PlayerAnimations/RunFrames/right_foot.tres" id="5_ky2p2"]
+[ext_resource type="Script" uid="uid://8uvysiawxw6" path="res://Scripts/Animation/secondary_animation.gd" id="6_7laf1"]
+
+[sub_resource type="Resource" id="Resource_se4yp"]
+script = ExtResource("1_1tuak")
+samples = Array[ExtResource("3_axwee")]([ExtResource("4_ki0ob")])
+metadata/_custom_type_script = "uid://bw7rrjq71rjhn"
+
+[sub_resource type="Resource" id="Resource_ma3ca"]
+script = ExtResource("1_1tuak")
+samples = Array[ExtResource("3_axwee")]([ExtResource("5_ky2p2")])
+metadata/_custom_type_script = "uid://bw7rrjq71rjhn"
+
+[resource]
+script = ExtResource("6_7laf1")
+frames = Dictionary[int, ExtResource("1_1tuak")]({
+0: SubResource("Resource_se4yp"),
+3: SubResource("Resource_ma3ca")
+})
+metadata/_custom_type_script = "uid://8uvysiawxw6"

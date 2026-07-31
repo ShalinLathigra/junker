@@ -12,27 +12,97 @@
     - Should create on load, add more when needed, and re-use when done
     - No scripting should be needed for this other than "play particle A"
 
-## Audio stuff
-- made the object pool, next step is to make methods for actually triggering audio playback
-    - Maybe movement audio is tied to an animation somehow. Still figuring that out
-        - Custom spriteFrames resource + player to let me attach sounds and particles to frames
-        - Do that instead of refcounted
+## Secondary Animation + Managers
+
+### High Level
+
+This part I'm tentatively hopeful for. Basically, I want the ability to play random audio SFX at random times, trigger puffs of smoke, etc., just do random stuff
+without specifically needing to set up the nodes for it every single time. I'm trying to accomplish that via a generic `ObjectPool` and manager setup.
+
+I created autoloads for handling audio and particle playback, as well as resources for encoding some important fields for each, i.e. volume, pitch, sample, material,
+    particle count, etc.
+
+Via the autoloads I can instance and configure these as single-use objects, or grab one for longer term use.
+
+### Secondary Animation
+
+Kind of a funky thing I'm doing alongside this, so we have these `AudioFrame` and `ParticleFrame` objects that encode the information about a given burst, I also added
+`SecondaryFrame` which collects lists of both, allowing multiple audio or particle effects to be triggered at the same frame.
+
+To use this, I attach a `SecondaryAnimator` node to the tree which accepts a target `SpriteAnimator`, and a dictionary of `SecondaryFrames`, mapping animations to
+inputs. the `SecondaryAnimator` then listens to `animation_changed` and `frame_changed` signals, triggering effects as they occur.
+
+### Patterns
+
+Two examples currently. `PlayerRun` and `PlayerJetpack`.
+
+In `PlayerRun` we somewhat naively play an audio clip with mild pitch, volume changes on frames 0, 3 of the "Run" animation. This happens automatically without any
+    interaction from me.
+
+In `PlayerJetpack`, I request an audio player off the top (technically two), they are saved in the state locally (not in the blackboard), and have their volume altered
+    in realtime as I want. 
 
 ## State Machines
 
+How does this work in my implementation?
 
-!! Switched this stuff to being RefCounted instead of Node, this means that they live mostly in code instead of being part of the tree (since they really don't need to be)
-!! This means that nodes don't communicate between them as much, but we can cross that when we need to. Probably this is just more detailed setup in the state machine.
-!! or a method or two for searching through the state tree on startup.
+There are two classes that essentially manage everything. StateMachine, and State
 
-I want to make a simple 'scripting language' out of nodes. There will be
-two kinds of nodes.
+This is set up as a hierarchical state machine, where every state can further specify behaviour, so really it's StateMachines the whole way down, but you get the gist.
+    On startup, any character or creature that requires it will instantiate a StateMachine, registering the top level states as needed. For a player example, see this:
 
-1. Action Nodes
-2. Utility Nodes
+```gdscript
+func _init_state_machine() -> void:
+    # Create top level
+	state_machine = StateMachine.new()
 
-Separate to these is the State Machine which gets given a State, then operates
-on that state.
+    # Create and update state trees
+	var ground = PlayerGround.new()
+	ground.register_states([PlayerRun.new(), Idle.new()])
+	var air = PlayerAir.new()
+	air.register_states([PlayerJetpack.new(), Fall.new()])
+    
+    # Register everything with the main machine
+	state_machine.register_states([air, ground])
+```
+
+### Shared State
+
+On startup, a state machine will be provided with a "blackboard", which is a dictionary containing all sorts of shared state between modules
+    There is a risk here that multiple states use the same details, but it's so convenient that I'm not going to worry for now.
+
+The state machine will then "inject" this blackboard into every child state, recursing through the whole structure so that every state
+    in the tree shares the same pointer. Transitions are not explicitly defined, but rather the tree will always flow from current state
+    to target state based on state contained within this tree, and the current state of each parent node.
+
+### Flow
+
+A StateMachine will check transitions every `tick` invokation by iterating over all states in order, flagging the first valid state.
+    If a new, non-null state is found, then we will trigger the state swap by invoking the old state's `exit` method, and the new
+    state's `enter` method (passing along a reference to the previous state of the state tree. The `exit` call will recurse down the branch so that
+    the very last state in the chain still gets to trigger any `exit` effects.
+
+For each state during this check, the `is_ready` method is invoked to determine whether it should be triggered or not.
+    Additionally, because the state readiness checks occur in order, there is an implicit priority to states so that no ties can ever form
+
+When a state is entered, we immediately check for further transitions, we hope to end up at a leaf state in most or all cases.
+
+CRITICAL: All of this control flow control stems from using `super.tick()` at the end of the main `tick` method for a state. If this is omitted then there will be no
+    automatic state transitions and control will depend solely on the parent state.
+    I intend to use this a lot for combat states, or for handling wonky movement situations
+
+### Patterns
+
+One recurring pattern for me is to have a top level state, i.e. `AirControl` or `GroundControl`, that handles some top-level behaviour, and will return `ready` when an
+    entry condition is met, or when a child state is in progress.
+
+For example, during `AirControl`, we enter whenever we are not currently grounded, but we are still able to enter `PlayerJetpack` when we are not in `AirControl`.
+    We accomplish this by having the `Jetpack` state check the blackboard for a jump input during the `is_ready` method, and if that input has been provided, then
+    we return true regardless of grounded state. This allows the state to actually process and get us off the ground, otherwise we could get 'stuck' grounded if the
+    movement was not significant enough.
+
+
+## Future Plans
 
 ### AI
 
@@ -84,47 +154,15 @@ Alrighty, so what sort of control flows exist here?
 
 - Movement Control
     - Ground
-        - Idling
-        - Running
-        - Ladder
-        - Landing
+        - [ ] Idling
+        - [ ] Running
+        - [ ] Ladder
+        - [ ] Landing
     - Combat
-        - Separate movement not a thing
-        - Attacks 1-3 + Special
-        - Damaged
-        - Dash
+        - [ ] Separate movement not a thing
+        - [ ] Attacks 1-3 + Special
+        - [ ] Damaged
+        - [ ] Dash
     - Air
-        - Transitioning from air to ground means we play the landing animation
-            first
-        - Animated Sprite needs a queue + methods for playing a one-shot or
-            skipping to next animation
-
-How do we determine transitions?
-- I don't really know offhand. I want to be able to:
-	1. determine what input is being requested
-	2. switch to that state
-	3. queue or trigger an animation
-- Keep inputs simple, ground vs air determined by grounded state
-- Buttons and Interactions are sent to Combat, if a transition is happening
-	then Combat state will say "I'm ready", and the State Machine will switch
-	to Combat
-	- This "check transitions" phase happens before we process states
-
-### Pseudocode
-
-class StateMachine:
-	current_state: State
-
-	func tick(_delta):
-		Check Transitions
-		If Transition:
-			Old State.exit()
-			New State.enter()
-		Current State.tick()
-
-class State:
-	<special variables>
-	func enter() -> void:
-		pass
-	func exit() -> void:
-		pass
+        - [ ] Fall
+        - [ ] Jetpack

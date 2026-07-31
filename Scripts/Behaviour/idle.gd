@@ -13,7 +13,7 @@ func init() -> void:
 	super.init()
 
 
-func is_ready() -> bool:
+func is_ready(_old_line: Array[State]) -> bool:
 	return blackboard.get("is_idle", false) and blackboard.get("is_grounded", true)
 
 
@@ -21,7 +21,7 @@ func exit() -> void:
 	super.exit()
 
 
-func enter() -> void:
+func enter(_old_line: Array[State] = []) -> void:
 	sprite_animator.play_immediate("Idle")
 	body.velocity = Vector2.ZERO
-	super.enter()
+	super.enter(_old_line)

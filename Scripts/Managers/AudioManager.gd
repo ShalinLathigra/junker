@@ -17,11 +17,29 @@ func _ready() -> void:
 	audio_pool.init("AudioManagerPool", _generate_audio_player)
 
 
-func play_audio_frame(frame: AudioFrame) -> void:
+func use_stream(
+		player: AudioStreamPlayer,
+		stream: AudioStream,
+		volume_db: float = 0.0,
+		pitch_scale: float = 1.0,
+) -> void:
+	player.stream = stream
+	player.volume_db = volume_db
+	player.pitch_scale = pitch_scale
+
+
+func use_frame(
+		player: AudioStreamPlayer,
+		frame: AudioFrame,
+) -> void:
+	player.stream = frame.stream
+	player.volume_db = frame.volume_db
+	player.pitch_scale = frame.pitch_scale
+
+
+func play_audio_frame_one_shot(frame: AudioFrame) -> void:
 	var new_player: AudioStreamPlayer = audio_pool.request()
-	new_player.stream = frame.stream
-	new_player.volume_db = frame.volume_db
-	new_player.pitch_scale = frame.pitch_scale
+	use_frame(new_player, frame)
 	new_player.finished.connect(
 		release_audio_player.bind(new_player),
 		CONNECT_ONE_SHOT,
@@ -31,6 +49,8 @@ func play_audio_frame(frame: AudioFrame) -> void:
 
 func release_audio_player(p: AudioStreamPlayer) -> void:
 	p.stop()
+	if p.get_parent() != self:
+		p.reparent(self)
 	audio_pool.release(p)
 
 
