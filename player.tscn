@@ -49,8 +49,8 @@ script = ExtResource("1_606se")
 [node name="SpriteAnimator" type="AnimatedSprite2D" parent="." unique_id=1130625279]
 unique_name_in_owner = true
 sprite_frames = ExtResource("2_hqtel")
-animation = &"Landing"
-frame = 3
+animation = &"Dash"
+frame = 6
 frame_progress = 1.0
 offset = Vector2(10.5, -16)
 script = ExtResource("11_pylmc")

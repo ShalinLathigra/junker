@@ -1,6 +1,14 @@
 @abstract class_name State
 extends StateMachine
 
+# Signal should only be used on a state when that state has an animation/etc. that it is waiting for or something
+# This signal signals that a state can be exited, not that it must be exited.
+signal finished
+
+var is_finished: bool
+# If blocking, then the invoking state machine cannot transition until this state is finished 
+var is_blocking: bool
+
 
 static func print_line(line: Array[State]) -> void:
 	for state in line:

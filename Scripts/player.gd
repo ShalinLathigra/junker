@@ -4,6 +4,7 @@ extends CharacterBody2D
 var blackboard: Dictionary
 # Track reference to the state machine and animator for feeding in to nodes
 var state_machine: StateMachine
+var forwards: Vector2
 
 @onready var sprite_animator: SpriteAnimator = %SpriteAnimator as SpriteAnimator
 # also attach a config file here, this will contain stuff like 
@@ -30,6 +31,7 @@ func _process(delta: float) -> void:
 	if x_input_axis != 0.0:
 		# player character is by default left facing
 		sprite_animator.point_towards(x_input_axis > 0, true)
+		forwards = Vector2.RIGHT * sign(x_input_axis)
 
 	blackboard.x_input_axis = x_input_axis
 	if Input.is_action_pressed("Jump"):
@@ -45,8 +47,6 @@ func _process(delta: float) -> void:
 func _physics_process(delta: float) -> void:
 	# Check ground
 	blackboard.is_grounded = is_on_floor()
-	if blackboard.is_grounded:
-		blackboard.tick_of_last_ground = Time.get_ticks_msec()
 	# blackboard.can_jump = early_ground_ray.collide_with_bodies and early_ground_ray.get_collider() is TileMapLayer
 
 	# Can track or add references to all sorts of state from here, then all states get access to the whole set
@@ -57,6 +57,7 @@ func _physics_process(delta: float) -> void:
 
 func _init_state_machine() -> void:
 	state_machine = StateMachine.new()
+	var combat = PlayerCombat.new()
 	var ground = PlayerGround.new()
 	ground.landed.connect(_trigger_landing_effects)
 	var run = PlayerRun.new()
@@ -66,7 +67,7 @@ func _init_state_machine() -> void:
 	var jetpack = PlayerJetpack.new()
 	var fall = Fall.new()
 	air.register_states([jetpack, fall])
-	state_machine.register_states([air, ground])
+	state_machine.register_states([combat, air, ground])
 
 
 func _trigger_landing_effects() -> void:

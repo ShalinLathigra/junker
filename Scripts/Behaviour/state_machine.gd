@@ -30,10 +30,14 @@ func tick(delta: float):
 	# check_transitions([])
 	# Get the current state tree immediately, pass that in to check_transitions
 	# Then, within check_transitions, we pass along the
-	check_transitions(_get_state_line())
+	# Only case we
+	if not current_state or current_state.is_finished or not current_state.is_blocking:
+		check_transitions(_get_state_line())
 	# leaf states won't have children
 	if current_state:
 		current_state.tick(delta)
+		# if current_state.is_finished:
+		#	current_state = null
 
 
 func physics_tick(delta: float):
