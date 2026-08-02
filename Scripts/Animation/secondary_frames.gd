@@ -1,21 +1,10 @@
-class_name SecondaryAnimator
-extends Node
+class_name SecondaryFrames
+extends Resource
 
-# This is a companion node that hooks in to a sprite animator
-# listens for frame changes, animation changes, etc. and 
-# triggers secondary effects, i.e. audio playback, when the attached
-# dictionary frames say it should
-@export var target: SpriteAnimator
-@export var secondary_frames: Dictionary[StringName, SecondaryFrames]
+@export var frames: Dictionary[int, SecondaryFrame]
 
 
-func _ready() -> void:
-	assert(target != null, "Cannot run without a target")
-	target.frame_changed.connect(_on_frame_changed)
-	target.animation_changed.connect(_on_frame_changed)
-
-
-func _on_frame_changed() -> void:
-	if not secondary_frames.has(target.animation):
+func invoke(frame: int) -> void:
+	if not frames.has(frame):
 		return
-	secondary_frames[target.animation].invoke(target.frame)
+	frames[frame].invoke() #target_position)

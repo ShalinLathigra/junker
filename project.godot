@@ -18,7 +18,7 @@ config/icon="res://icon.svg"
 [autoload]
 
 AudioManager="*uid://bty74htdq6dia"
-ParticleManager="*uid://bqtp7nyiiqir"
+ParticleManager="uid://f2rkwg7041vd"
 
 [display]
 

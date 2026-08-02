@@ -2,6 +2,18 @@
 extends StateMachine
 
 
+static func print_line(line: Array[State]) -> void:
+	for state in line:
+		print("\t", state.get_script().get_global_name())
+
+
+static func line_has_state(line: Array[State], type: Variant) -> bool:
+	for state in line:
+		if is_instance_of(state, type):
+			return true
+	return false
+
+
 func enter(old_line: Array[State] = []) -> void:
 	# when I enter a state, immediately check transitions to see if a child
 	# state needs to enter as well

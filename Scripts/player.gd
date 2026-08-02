@@ -47,7 +47,7 @@ func _physics_process(delta: float) -> void:
 	blackboard.is_grounded = is_on_floor()
 	if blackboard.is_grounded:
 		blackboard.tick_of_last_ground = Time.get_ticks_msec()
-	blackboard.can_jump = early_ground_ray.collide_with_bodies and early_ground_ray.get_collider() is TileMapLayer
+	# blackboard.can_jump = early_ground_ray.collide_with_bodies and early_ground_ray.get_collider() is TileMapLayer
 
 	# Can track or add references to all sorts of state from here, then all states get access to the whole set
 	# Yes it's ugly, but it's fiine
@@ -58,7 +58,17 @@ func _physics_process(delta: float) -> void:
 func _init_state_machine() -> void:
 	state_machine = StateMachine.new()
 	var ground = PlayerGround.new()
-	ground.register_states([PlayerRun.new(), Idle.new()])
+	ground.landed.connect(_trigger_landing_effects)
+	var run = PlayerRun.new()
+	var idle = Idle.new()
+	ground.register_states([run, idle])
 	var air = PlayerAir.new()
-	air.register_states([PlayerJetpack.new(), Fall.new()])
+	var jetpack = PlayerJetpack.new()
+	var fall = Fall.new()
+	air.register_states([jetpack, fall])
 	state_machine.register_states([air, ground])
+
+
+func _trigger_landing_effects() -> void:
+	%LandParticles.restart(true)
+	%LandAudio.play()

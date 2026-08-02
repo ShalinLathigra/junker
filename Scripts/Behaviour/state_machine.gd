@@ -64,8 +64,7 @@ func check_transitions(old_line: Array[State]) -> void:
 		if current_state:
 			old_id = current_state.id
 		# Print the detailed tree next
-		for state in old_line:
-			print("\t", state.get_script().get_global_name())
+		State.print_line(old_line)
 	if current_state:
 		current_state.exit()
 	# maybe we also pass a reference to the previous state in to enter()

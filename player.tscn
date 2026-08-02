@@ -2,15 +2,46 @@
 
 [ext_resource type="Script" uid="uid://8wekqn6pw02d" path="res://Scripts/player.gd" id="1_606se"]
 [ext_resource type="SpriteFrames" uid="uid://qcnm88hiql7t" path="res://Resources/player_frames.tres" id="2_hqtel"]
-[ext_resource type="Script" uid="uid://ch65tmo1qsrum" path="res://Scripts/Animation/secondary_frames.gd" id="4_sweqy"]
-[ext_resource type="Script" uid="uid://mj7x2kxhgiuu" path="res://Scripts/Animation/secondary_animation.gd" id="5_nvl01"]
+[ext_resource type="Script" uid="uid://ch65tmo1qsrum" path="res://Scripts/Animation/secondary_animator.gd" id="4_sweqy"]
+[ext_resource type="Script" uid="uid://mj7x2kxhgiuu" path="res://Scripts/Animation/secondary_frames.gd" id="5_nvl01"]
 [ext_resource type="Resource" uid="uid://bt4vlewduhkry" path="res://Resources/PlayerAnimations/run.tres" id="6_1jxqw"]
+[ext_resource type="AudioStream" uid="uid://dot3f2dqfh6oe" path="res://Assets/impactWood_medium_004.ogg" id="8_dw050"]
 [ext_resource type="Script" uid="uid://dl1dw4qbpu2lv" path="res://Scripts/Animation/sprite_animator.gd" id="11_pylmc"]
 [ext_resource type="Script" uid="uid://j2irqosk23wv" path="res://Scripts/Debug/state_display.gd" id="19_pylmc"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_liex2"]
 radius = 3.0
 height = 11.0
+
+[sub_resource type="Gradient" id="Gradient_1jxqw"]
+offsets = PackedFloat32Array(0, 0.26834512, 0.75577974, 1)
+colors = PackedColorArray(1, 1, 1, 1, 1, 1, 1, 0.70555246, 1, 1, 1, 0.6666667, 1, 1, 1, 0)
+
+[sub_resource type="GradientTexture1D" id="GradientTexture1D_2j0kj"]
+gradient = SubResource("Gradient_1jxqw")
+
+[sub_resource type="Curve" id="Curve_dw050"]
+_data = [Vector2(0, 0.4993629), 0.0, -0.15411842, 0, 0, Vector2(1, 0.8732196), -1.1617107, 0.0, 0, 0]
+point_count = 2
+
+[sub_resource type="CurveTexture" id="CurveTexture_bodfo"]
+curve = SubResource("Curve_dw050")
+
+[sub_resource type="ParticleProcessMaterial" id="ParticleProcessMaterial_liex2"]
+particle_flag_disable_z = true
+angle_min = -92.99999
+angle_max = 91.30001
+direction = Vector3(0, -1, 0)
+spread = 60.0
+initial_velocity_min = 15.0
+initial_velocity_max = 25.0
+angular_velocity_min = -46.870014
+angular_velocity_max = 128.69998
+gravity = Vector3(0, 50, 0)
+scale_min = 8.0
+scale_max = 12.0
+scale_curve = SubResource("CurveTexture_bodfo")
+color_ramp = SubResource("GradientTexture1D_2j0kj")
 
 [node name="PlayerBody" type="CharacterBody2D" unique_id=1972975139]
 script = ExtResource("1_606se")
@@ -41,7 +72,7 @@ position = Vector2(0, -1)
 
 [node name="Blackboard" type="Node" parent="." unique_id=680447841]
 
-[node name="CenterContainer" type="CenterContainer" parent="." unique_id=1649035259]
+[node name="STATE DEBUG" type="CenterContainer" parent="." unique_id=1649035259]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -54,10 +85,25 @@ offset_bottom = -15.0
 grow_horizontal = 2
 grow_vertical = 2
 
-[node name="StateLabel" type="Label" parent="CenterContainer" unique_id=352369679 node_paths=PackedStringArray("target_node")]
+[node name="StateLabel" type="Label" parent="STATE DEBUG" unique_id=352369679 node_paths=PackedStringArray("target_node")]
 layout_mode = 2
 theme_override_font_sizes/font_size = 8
 text = "GroundControl"
 horizontal_alignment = 1
 script = ExtResource("19_pylmc")
 target_node = NodePath("../..")
+
+[node name="LandParticles" type="GPUParticles2D" parent="." unique_id=1410295333]
+unique_name_in_owner = true
+emitting = false
+amount = 4
+lifetime = 0.6
+one_shot = true
+explosiveness = 1.0
+process_material = SubResource("ParticleProcessMaterial_liex2")
+
+[node name="LandAudio" type="AudioStreamPlayer" parent="LandParticles" unique_id=1914639732]
+unique_name_in_owner = true
+stream = ExtResource("8_dw050")
+volume_db = -6.0
+pitch_scale = 0.8
